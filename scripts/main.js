@@ -7,46 +7,57 @@ let defWidth = 50;
 let defX = (canvas.width - defWidth) / 2;
 let defY = (canvas.height - defHeight) / 2;
 //defining
-let x = canvas.width / 2;
-let y = canvas.height - 30;
+let vickX = canvas.width / 2;
+let vickY = canvas.height - 30;
+let z = 20
 let personSpeed = 8;
 //speed of vid
 let dx = 3;
 let dy = 3;
+
 let rightPressed = false;
 let leftPressed = false;
 let upPressed = false;
 let downPressed = false;
 
 let score = 0;
-//draw person
+
+//creates sprite
 function drawDefender() {
     ctx.beginPath();
     ctx.rect(defX, defY, defWidth, defHeight);
     ctx.fillStyle = "#b3b3b3";
     ctx.fill();
     ctx.closePath();
+
 }
 
-function collision () {
-    if (x > defX && x  < defX + defWidth )
+// detects when covid hit person
+function collisionDetect() {
+    if (vickX + z > defX && vickX < defX + defWidth && vickY > defY && vickY + z < defY + defHeight) {
+    alert("game over you got a whopping " + score);
+    document.location.reload();
+    clearInterval(interval);
+    }
 }
+
 //draw covid
 function DrawCovid() {
     ctx.beginPath();
-    ctx.rect(x, y, 20, 20)
+    ctx.rect(vickX, vickY, z, z)
     ctx.fillStyle = "tomato";
     ctx.fill();
     ctx.closePath();
 }
 
+//defines a function to display score
 function drawScore() {
     ctx.font = "16px Arial";
-    ctx.fillStyle = "#0095DD";
+    ctx.fillStyle = "black";
     ctx.fillText("Score: " + score, 8, 20);
 }
 
-//creates objects
+//creates sprites, score, and others
 function draw() {
     //clear
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -56,14 +67,16 @@ function draw() {
     //draw person
     drawDefender();
 
+    collisionDetect();
+
     //covid
     DrawCovid();
 
-    x += dx;
-    y += dy;
+    vickX += dx;
+    vickY += dy;
 
-    //edge detection
-    if (x + dx > canvas.width - 10 || x + dx < 10) {
+    //edge detection, speed increases with score, points by touching x edge, increasing difficulty
+    if (vickX + dx > canvas.width - 10 || vickX + dx < 10) {
         dx = -dx;
         score++;
         if (score == 5) {
@@ -100,13 +113,13 @@ function draw() {
         }
 
     }
-    if (y + dy > canvas.height - 10 || y + dy < 10) {
+    if (vickY + dy > canvas.height - 10 || vickY + dy < 10) {
         dy = -dy;
     }
 
 
 
-    //move
+    //moves the sprite
     if (rightPressed) {
         defX += personSpeed;
         if (defX + defWidth > canvas.width) {
@@ -167,8 +180,9 @@ function keyUpHandler(e) {
     }
 }
 
-
+//"listens" for the pressed and released keys
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 
-setInterval(draw, 10);
+//let interval allows a refresh of the page on loss
+let interval = setInterval(draw, 10);
